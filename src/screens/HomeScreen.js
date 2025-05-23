@@ -6,8 +6,10 @@ import { ThemeContext } from '../context/ThemeContext';
 import WeatherCard from '../components/WeatherCard';
 import LoadingIndicator from '../components/LoadingIndicator';
 import ErrorMessage from '../components/ErrorMessage';
+import LocationHeader from '../components/LocationHeader';
+import LocationPermissionRequest from '../components/LocationPermissionRequest';
 import { getCurrentWeatherByCoords } from '../services/weatherService';
-import { getCurrentLocation } from '../services/locationService';
+import { getCurrentLocation, requestLocationPermission } from '../services/locationService';
 
 const HomeScreen = ({ navigation }) => {
   const { theme } = useContext(ThemeContext);
@@ -15,10 +17,25 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [hasLocationPermission, setHasLocationPermission] = useState(null);
 
   useEffect(() => {
-    fetchWeatherData();
+    checkLocationPermission();
   }, []);
+
+  const checkLocationPermission = async () => {
+    try {
+      const hasPermission = await requestLocationPermission();
+      setHasLocationPermission(hasPermission);
+      
+      if (hasPermission) {
+        fetchWeatherData();
+      }
+    } catch (error) {
+      console.error('Error checking location permission:', error);
+      setHasLocationPermission(false);
+    }
+  };
 
   const fetchWeatherData = async () => {
     try {
@@ -27,12 +44,12 @@ const HomeScreen = ({ navigation }) => {
       
       // Get current location
       const location = await getCurrentLocation();
-      console.log('Location received:', location); 
-
-       // Ensure location has latitude and longitude
-    if (!location || !location.latitude || !location.longitude) {
-      throw new Error('Invalid location data');
-    }
+      console.log('Location received:', location);
+      
+      // Ensure location has latitude and longitude
+      if (!location || !location.latitude || !location.longitude) {
+        throw new Error('Invalid location data');
+      }
       
       // Fetch weather data for current location
       const weatherData = await getCurrentWeatherByCoords(
@@ -65,15 +82,33 @@ const HomeScreen = ({ navigation }) => {
   };
 
   if (loading && !refreshing) {
-    return <LoadingIndicator message="Fetching weather data..." />;
+    return (
+      <LoadingIndicator message="Fetching weather data..." />
+    );
+  }
+
+  if (!hasLocationPermission) {
+    return (
+      <LocationPermissionRequest onRequestPermission={checkLocationPermission} />
+    );
   }
 
   if (error && !weather) {
-    return <ErrorMessage message={error} onRetry={fetchWeatherData} />;
+    return (
+      <ErrorMessage message={error} onRetry={fetchWeatherData} />
+    );
   }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
+      {weather && (
+        <LocationHeader 
+          city={weather.city} 
+          country={weather.country} 
+          onRefresh={fetchWeatherData} 
+        />
+      )}
+      
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
