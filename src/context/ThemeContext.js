@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useRef } from 'react';
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -37,13 +37,44 @@ export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState(deviceTheme === 'dark' ? darkTheme : lightTheme);
     const [themeMode, setThemeMode] = useState('system');
 
-        useEffect(() => {
+    //animation value added for some smooth transitions through the system
+const animatedValue = useRef(new Animated.Value(deviceTheme === 'dark' ? 1 : 0)).current;
+
+      // Animated theme values
+  const animatedTheme = {
+    mode: theme.mode,
+    background: animatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [lightTheme.background, darkTheme.background],
+    }),
+    text: animatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [lightTheme.text, darkTheme.text],
+    }),
+    card: animatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [lightTheme.card, darkTheme.card],
+    }),
+    border: animatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [lightTheme.border, darkTheme.border],
+    }),
+    primary: theme.primary,
+    secondary: theme.secondary,
+    success: theme.success,
+    danger: theme.danger,
+    warning: theme.warning,
+    info: theme.info,
+  };
+
+    useEffect(() => {
           loadThemePreference();
-         }, []);
+    }, []);
 
     useEffect(() => {
         if (themeMode === 'system') {
-            setTheme(deviceTheme === 'dark' ? darkTheme : lightTheme);
+            const newTheme = deviceTheme === 'dark' ? darkTheme : lightTheme;
+            animatedThemeChange(newTheme);
         }
     }, [deviceTheme, themeMode]);
 
@@ -53,9 +84,12 @@ export const ThemeProvider = ({ children }) => {
                 if (savedThemeMode) {
                     setThemeMode(savedThemeMode);
                     if (savedThemeMode === 'light') {
-                        setTheme(lightTheme);
+                        animatedThemeChange(lightTheme);
                     } else if (savedThemeMode === 'dark') {
-                        setTheme(darkTheme);
+                        animatedThemeChange(darkTheme);
+                    } else {
+                        const systemTheme = deviceTheme === 'dark' ? darkTheme : lightTheme;
+                        animatThemeChange(systemTheme);
                     }
                 }
             }catch (error) {
@@ -63,21 +97,37 @@ export const ThemeProvider = ({ children }) => {
             }
         };
 
-        const toggleTheme = async () => {
-            const newThemeMode = themeMode === 'system'
-            ? (theme.mode === 'light' ? 'dark' : 'light')
-            : (themeMode === 'light' ? 'dark' : 'light'); 
+    const animateThemeChange = (newTheme) => {
+    setTheme(newTheme);
+    
+    Animated.timing(animatedValue, {
+      toValue: newTheme.mode === 'dark' ? 1 : 0,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
 
-              
+        const toggleTheme = async () => {
+            let newThemeMode;
+            let newTheme;
+
+           if (themeMode === 'system') {
+      newThemeMode = theme.mode === 'light' ? 'dark' : 'light';
+    } else {
+      newThemeMode = themeMode === 'light' ? 'dark' : 'system';
+    }
+              ////
              setThemeMode(newThemeMode);
 
             if (newThemeMode === 'light') {
-                 setTheme(lightTheme);
+                 newTheme = lightTheme;
              } else if (newThemeMode === 'dark'){
-                setTheme(darkTheme);
+                newTheme = darkTheme;
             } else {
-                 setTheme(deviceTheme === 'dark' ? darkTheme : lightTheme);
+                 newTheme = deviceTheme === 'dark' ? darkTheme : lightTheme;
            }
+
+           animatedThemeChange(newTheme);
 
            try{
              await AsyncStorage.setItem('themeMode', newThemeMode);

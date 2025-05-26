@@ -10,6 +10,7 @@ import LocationHeader from '../components/LocationHeader';
 import LocationPermissionRequest from '../components/LocationPermissionRequest';
 import { getCurrentWeatherByCoords } from '../services/weatherService';
 import { getCurrentLocation, requestLocationPermission } from '../services/locationService';
+import CustomRefreshControl from '../components/CustomRefreshControl';
 
 const HomeScreen = ({ navigation }) => {
   const { theme } = useContext(ThemeContext);
@@ -112,17 +113,13 @@ const HomeScreen = ({ navigation }) => {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl
+          <CustomRefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={[theme.primary]}
-            tintColor={theme.primary}
           />
         }
       >
-        {weather && (
-          <WeatherCard weather={weather} onPress={navigateToForecast} />
-        )}
+            {/*...*/}
       </ScrollView>
       
       <View style={styles.fabContainer}>

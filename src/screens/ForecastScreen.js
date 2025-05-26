@@ -1,10 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, StyleSheet, ScrollView, RefreshControl, Text } from 'react-native';
 import { ThemeContext } from '../context/ThemeContext';
 import ForecastCard from '../components/ForecastCard';
 import LoadingIndicator from '../components/LoadingIndicator';
 import ErrorMessage from '../components/ErrorMessage';
 import { getForecastByCoords, getForecastByCity } from '../services/weatherService';
+import DailyHighlights from '../components/DailyHighlights';
 
 const ForecastScreen = ({ route, navigation}) => {
     const { theme } = useContext(ThemeContext);
@@ -71,10 +72,32 @@ const ForecastScreen = ({ route, navigation}) => {
   }
 
 
-////stopped
+//
   return (
-    <View style={styles.container}>
-      <Text>ForecastScreen - Current Weather will be displayed here</Text>
+    <View style={[styles.container, { backgroundColor: theme.background}]}>
+     <ScrollView
+     contentContainerStyle={styles.scrollContent}
+     refreshControl={
+        <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[theme.primary]}
+            tintColor={theme.primary}
+        />
+        }
+     >
+        <Text style={[styles.locationTitle, {color: theme.text}]}>
+            {forecast.city}, {forecast.country}
+        </Text>
+
+         {Object.entries(forecast.groupedByDay).map(([date, dayForecast]) => (
+           <React.Fragment key={date}>
+          <ForecastCard date={date} forecast={dayForecast} />
+          {index === 0 && <DailyHighlights forecast={dayForecast} />}
+        </React.Fragment>
+        ))}
+
+     </ScrollView>
     </View>
   );
 };
@@ -82,8 +105,21 @@ const ForecastScreen = ({ route, navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingVertical: 16,
+  },
+  locationTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  noDataText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 24,
   },
 });
 
