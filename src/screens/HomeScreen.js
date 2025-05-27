@@ -119,7 +119,12 @@ const HomeScreen = ({ navigation }) => {
           />
         }
       >
-            {/*...*/}
+        {weather && (
+          <WeatherCard 
+            weather={weather} 
+            onPress={navigateToForecast} 
+          />
+        )}
       </ScrollView>
       
       <View style={styles.fabContainer}>

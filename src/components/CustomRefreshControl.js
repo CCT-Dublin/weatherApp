@@ -13,7 +13,6 @@ const CustomRefreshControl = ({ refreshing, onRefresh }) => {
       tintColor={theme.primary}
       progressBackgroundColor={theme.card}
       progressViewOffset={10}
-      size={RefreshControl.SIZE.LARGE}
       title="Updating weather data..."
       titleColor={theme.text}
     />

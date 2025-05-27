@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ThemeContext } from '../context/ThemeContext';
 import AnimatedWeatherIcon from './AnimatedWeatherIcon';
 
 const WeatherCard = ({ weather, onPress }) => {
-  const { animatedTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
   
@@ -61,7 +61,7 @@ const WeatherCard = ({ weather, onPress }) => {
         style={[
           styles.card, 
           { 
-            backgroundColor: animatedTheme.card,
+            backgroundColor: theme.card,
             opacity: fadeAnim,
             transform: [{ translateY }]
           }
@@ -70,93 +70,93 @@ const WeatherCard = ({ weather, onPress }) => {
         <View style={styles.cardContent}>
           <View style={styles.header}>
             <View>
-              <Animated.Text style={[styles.title, { color: animatedTheme.text }]}>
+              <Text style={[styles.title, { color: theme.text }]}>
                 {weather.city}, {weather.country}
-              </Animated.Text>
-              <Animated.Text style={[styles.subtitle, { color: animatedTheme.text }]}>
+              </Text>
+              <Text style={[styles.subtitle, { color: theme.text }]}>
                 {weather.date} • {weather.time}
-              </Animated.Text>
+              </Text>
             </View>
             <TouchableOpacity onPress={onPress}>
-              <Animated.View style={styles.moreButton}>
-                <MaterialCommunityIcons name="chevron-right" size={24} color={animatedTheme.text} />
-              </Animated.View>
+              <View style={styles.moreButton}>
+                <MaterialCommunityIcons name="chevron-right" size={24} color={theme.text} />
+              </View>
             </TouchableOpacity>
           </View>
           
           <View style={styles.weatherInfo}>
             <View style={styles.temperatureContainer}>
-              <Animated.Text style={[styles.temperature, { color: animatedTheme.text }]}>
+              <Text style={[styles.temperature, { color: theme.text }]}>
                 {weather.temperature}°C
-              </Animated.Text>
-              <Animated.Text style={[styles.feelsLike, { color: animatedTheme.text }]}>
+              </Text>
+              <Text style={[styles.feelsLike, { color: theme.text }]}>
                 Feels like {weather.feelsLike}°C
-              </Animated.Text>
+              </Text>
             </View>
             
             <View style={styles.iconContainer}>
               <AnimatedWeatherIcon 
                 name={getWeatherIconName(weather.icon)} 
                 size={80} 
-                color={animatedTheme.primary} 
+                color={theme.primary} 
               />
-              <Animated.Text style={[styles.description, { color: animatedTheme.text }]}>
+              <Text style={[styles.description, { color: theme.text }]}>
                 {weather.description.charAt(0).toUpperCase() + weather.description.slice(1)}
-              </Animated.Text>
+              </Text>
             </View>
           </View>
           
           <View style={styles.detailsContainer}>
             <View style={styles.detailItem}>
-              <AnimatedWeatherIcon name="water-percent" size={22} color={animatedTheme.text} />
-              <Animated.Text style={[styles.detailText, { color: animatedTheme.text }]}>
+              <MaterialCommunityIcons name="water-percent" size={22} color={theme.secondary} />
+              <Text style={[styles.detailText, { color: theme.text }]}>
                 {weather.humidity}%
-              </Animated.Text>
-              <Animated.Text style={[styles.detailLabel, { color: animatedTheme.text }]}>
+              </Text>
+              <Text style={[styles.detailLabel, { color: theme.text }]}>
                 Humidity
-              </Animated.Text>
+              </Text>
             </View>
             
             <View style={styles.detailItem}>
-              <AnimatedWeatherIcon name="weather-windy" size={22} color={animatedTheme.text} />
-              <Animated.Text style={[styles.detailText, { color: animatedTheme.text }]}>
+              <MaterialCommunityIcons name="weather-windy" size={22} color={theme.secondary} />
+              <Text style={[styles.detailText, { color: theme.text }]}>
                 {weather.windSpeed} m/s
-              </Animated.Text>
-              <Animated.Text style={[styles.detailLabel, { color: animatedTheme.text }]}>
+              </Text>
+              <Text style={[styles.detailLabel, { color: theme.text }]}>
                 Wind
-              </Animated.Text>
+              </Text>
             </View>
             
             <View style={styles.detailItem}>
-              <AnimatedWeatherIcon name="gauge" size={22} color={animatedTheme.text} />
-              <Animated.Text style={[styles.detailText, { color: animatedTheme.text }]}>
+              <MaterialCommunityIcons name="gauge" size={22} color={theme.secondary} />
+              <Text style={[styles.detailText, { color: theme.text }]}>
                 {weather.pressure} hPa
-              </Animated.Text>
-              <Animated.Text style={[styles.detailLabel, { color: animatedTheme.text }]}>
+              </Text>
+              <Text style={[styles.detailLabel, { color: theme.text }]}>
                 Pressure
-              </Animated.Text>
+              </Text>
             </View>
           </View>
           
           <View style={styles.sunTimesContainer}>
             <View style={styles.sunTimeItem}>
-              <AnimatedWeatherIcon name="weather-sunset-up" size={22} color={animatedTheme.text} />
-              <Animated.Text style={[styles.sunTimeText, { color: animatedTheme.text }]}>
+              <MaterialCommunityIcons name="weather-sunset-up" size={22} color={theme.secondary} />
+              <Text style={[styles.sunTimeText, { color: theme.text }]}>
                 {weather.sunrise}
-              </Animated.Text>
-              <Animated.Text style={[styles.sunTimeLabel, { color: animatedTheme.text }]}>
+              </Text>
+              <Text style={[styles.sunTimeLabel, { color: theme.text }]}>
                 Sunrise
-              </Animated.Text>
+              </Text>
             </View>
             
             <View style={styles.sunTimeItem}>
-              <AnimatedWeatherIcon name="weather-sunset-down" size={22} color={animatedTheme.text} />
-              <Animated.Text style={[styles.sunTimeText, { color: animatedTheme.text }]}>
+              <MaterialCommunityIcons name="weather-sunset-down" size={22} color={theme.secondary} />
+              <Text style={[styles.sunTimeText, { color: theme.text }]}>
                 {weather.sunset}
-              </Animated.Text>
-              <Animated.Text style={[styles.sunTimeLabel, { color: animatedTheme.text }]}>
+              </Text>
+              <Text style={[styles.sunTimeLabel, { color: theme.text }]}>
                 Sunset
-              </Animated.Text>
+              </Text>
             </View>
           </View>
         </View>

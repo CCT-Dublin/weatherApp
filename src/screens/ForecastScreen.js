@@ -11,7 +11,7 @@ const ForecastScreen = ({ route, navigation}) => {
     const { theme } = useContext(ThemeContext);
     const { city, coordinates } = route.params || {};
 
-    const [forecast, setForeCast] = useState(null);
+    const [forecast, setForecast] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
@@ -19,9 +19,9 @@ const ForecastScreen = ({ route, navigation}) => {
     useEffect(() => {
         fetchForecastData();
 
-        //this updates navigation tittle
+        //this updates navigation title
         if(city) {
-            navigation.setOptions({ title: '${city} Forecast'});
+            navigation.setOptions({ title: `${city} Forecast`});
         }
     }, [city, coordinates]);
 
@@ -90,7 +90,7 @@ const ForecastScreen = ({ route, navigation}) => {
             {forecast.city}, {forecast.country}
         </Text>
 
-         {Object.entries(forecast.groupedByDay).map(([date, dayForecast]) => (
+         {Object.entries(forecast.groupedByDay).map(([date, dayForecast], index) => (
            <React.Fragment key={date}>
           <ForecastCard date={date} forecast={dayForecast} />
           {index === 0 && <DailyHighlights forecast={dayForecast} />}

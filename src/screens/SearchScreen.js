@@ -141,9 +141,9 @@ const SearchScreen = ({ navigation }) => {
         onChangeText={setSearchQuery}
         value={searchQuery}
         onSubmitEditing={handleSearch}
-        style={styles.searchBar}
+        style={[styles.searchBar, { backgroundColor: '#3a3a3a' }]}
         iconColor={theme.text}
-        inputStyle={{ color: theme.text }}
+        inputStyle={{ color: '#ffffff' }}
         placeholderTextColor={theme.secondary}
         theme={{ colors: { primary: theme.primary } }}
       />

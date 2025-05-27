@@ -19,13 +19,13 @@ const ForecastCard = ({ forecast, date }) => {
     const maxTemp = Math.max(...forecast.map(item => item.temperature));
 
     return (
-        <Card style={[StyleSheet.card, { backgroundColor: theme.card}]}>
+        <Card style={[styles.card, { backgroundColor: theme.card}]}>
             <Card.Content>
-                <Text style={[StyleSheet.date, {color:theme.text }]}>{date}</Text>
+                <Text style={[styles.date, {color:theme.text }]}>{date}</Text>
 
-            <View style={StyleSheet.summaryContainer}>
-                <View style={StyleSheet.temperatureRange}>
-                    <Text style={[StyleSheet.tempMax, { color: theme.text }]}>{maxTemp}°</Text>
+            <View style={styles.summaryContainer}>
+                <View style={styles.temperatureRange}>
+                    <Text style={[styles.tempMax, { color: theme.text }]}>{maxTemp}°</Text>
                     <Text style={[styles.tempMin, { color: theme.secondary }]}>{minTemp}°</Text>
                 </View>
                 
@@ -37,11 +37,11 @@ const ForecastCard = ({ forecast, date }) => {
           </View>
         </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={hourlyContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hourlyContainer}>
             {forecast.map((item, index) => (
                 <View key={index} style={styles.hourlyItem}>
                     <Text style={[styles.hourlyTime, {color: theme.text }]}>{item.time}</Text>
-                    <Image source={{ uri: item.iconUr }} style={styles.hourlyIcon} />                
+                    <Image source={{ uri: item.iconUrl }} style={styles.hourlyIcon} />                
                     <Text style={[styles.hourlyTemp, { color: theme.text }]}>{item.temperature}°</Text>
                 </View>
             ))}
@@ -96,66 +96,60 @@ const styles = StyleSheet.create({
     },
     temperatureRange: {
         flexDirection: 'row',
-        alignItem: 'baseline',
+        alignItems: 'baseline',
     },
     tempMax: {
         fontSize: 28,
         fontWeight: 'bold',
         marginRight: 8,
     },
-    tempMax: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginRight: 8,
-  },
-  tempMin: {
-    fontSize: 20,
-  },
-  weatherInfo: {
-    alignItems: 'center',
-  },
-  weatherIcon: {
-    width: 50,
-    height: 50,
-  },
-  description: {
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  hourlyContainer: {
-    marginBottom: 16,
-  },
-  hourlyItem: {
-    alignItems: 'center',
-    marginRight: 16,
-    width: 60,
-  },
-  hourlyTime: {
-    fontSize: 12,
-    marginBottom: 4,
-  },
-  hourlyIcon: {
-    width: 30,
-    height: 30,
-    marginBottom: 4,
-  },
-  hourlyTemp: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  detailsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  detailText: {
-    fontSize: 14,
-    marginLeft: 4,
-  },
-
+    tempMin: {
+        fontSize: 20,
+    },
+    weatherInfo: {
+        alignItems: 'center',
+    },
+    weatherIcon: {
+        width: 50,
+        height: 50,
+    },
+    description: {
+        fontSize: 14,
+        textAlign: 'center',
+    },
+    hourlyContainer: {
+        marginBottom: 16,
+    },
+    hourlyItem: {
+        alignItems: 'center',
+        marginRight: 16,
+        width: 60,
+    },
+    hourlyTime: {
+        fontSize: 12,
+        marginBottom: 4,
+    },
+    hourlyIcon: {
+        width: 30,
+        height: 30,
+        marginBottom: 4,
+    },
+    hourlyTemp: {
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    detailsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    detailItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    detailText: {
+        fontSize: 14,
+        marginLeft: 4,
+    },
 });
 
 export default ForecastCard;

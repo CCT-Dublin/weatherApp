@@ -36,111 +36,92 @@ export const ThemeProvider = ({ children }) => {
     const deviceTheme = useColorScheme();
     const [theme, setTheme] = useState(deviceTheme === 'dark' ? darkTheme : lightTheme);
     const [themeMode, setThemeMode] = useState('system');
-
-    //animation value added for some smooth transitions through the system
-const animatedValue = useRef(new Animated.Value(deviceTheme === 'dark' ? 1 : 0)).current;
-
-      // Animated theme values
-  const animatedTheme = {
-    mode: theme.mode,
-    background: animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [lightTheme.background, darkTheme.background],
-    }),
-    text: animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [lightTheme.text, darkTheme.text],
-    }),
-    card: animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [lightTheme.card, darkTheme.card],
-    }),
-    border: animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [lightTheme.border, darkTheme.border],
-    }),
-    primary: theme.primary,
-    secondary: theme.secondary,
-    success: theme.success,
-    danger: theme.danger,
-    warning: theme.warning,
-    info: theme.info,
-  };
+    const [isAnimating, setIsAnimating] = useState(false);
+    
+    // Store previous theme for animation purposes
+    const prevThemeRef = useRef(theme);
 
     useEffect(() => {
-          loadThemePreference();
+        loadThemePreference();
     }, []);
 
     useEffect(() => {
         if (themeMode === 'system') {
             const newTheme = deviceTheme === 'dark' ? darkTheme : lightTheme;
-            animatedThemeChange(newTheme);
+            changeTheme(newTheme);
         }
     }, [deviceTheme, themeMode]);
 
     const loadThemePreference = async () => {
         try {
             const savedThemeMode = await AsyncStorage.getItem('themeMode');
-                if (savedThemeMode) {
-                    setThemeMode(savedThemeMode);
-                    if (savedThemeMode === 'light') {
-                        animatedThemeChange(lightTheme);
-                    } else if (savedThemeMode === 'dark') {
-                        animatedThemeChange(darkTheme);
-                    } else {
-                        const systemTheme = deviceTheme === 'dark' ? darkTheme : lightTheme;
-                        animatThemeChange(systemTheme);
-                    }
+            if (savedThemeMode) {
+                setThemeMode(savedThemeMode);
+                if (savedThemeMode === 'light') {
+                    changeTheme(lightTheme);
+                } else if (savedThemeMode === 'dark') {
+                    changeTheme(darkTheme);
+                } else {
+                    const systemTheme = deviceTheme === 'dark' ? darkTheme : lightTheme;
+                    changeTheme(systemTheme);
                 }
-            }catch (error) {
-                console.log('Error loading theme preference:', error);
             }
-        };
+        } catch (error) {
+            console.log('Error loading theme preference:', error);
+        }
+    };
 
-    const animateThemeChange = (newTheme) => {
-    setTheme(newTheme);
+    const changeTheme = (newTheme) => {
+        prevThemeRef.current = theme;
+        setTheme(newTheme);
+        setIsAnimating(true);
+        
+        // Reset animation flag after animation duration
+        setTimeout(() => {
+            setIsAnimating(false);
+        }, 300);
+    };
+
+    const toggleTheme = async () => {
+        let newThemeMode;
+        let newTheme;
+
+        if (themeMode === 'system') {
+            newThemeMode = theme.mode === 'light' ? 'dark' : 'light';
+        } else {
+            newThemeMode = themeMode === 'light' ? 'dark' : 'system';
+        }
+        
+        setThemeMode(newThemeMode);
+
+        if (newThemeMode === 'light') {
+            newTheme = lightTheme;
+        } else if (newThemeMode === 'dark'){
+            newTheme = darkTheme;
+        } else {
+            newTheme = deviceTheme === 'dark' ? darkTheme : lightTheme;
+        }
+
+        changeTheme(newTheme);
+
+        try {
+            await AsyncStorage.setItem('themeMode', newThemeMode);
+        } catch (error) {
+            console.log('Error saving theme preference:', error);
+        }
+    };
     
-    Animated.timing(animatedValue, {
-      toValue: newTheme.mode === 'dark' ? 1 : 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  };
-
-        const toggleTheme = async () => {
-            let newThemeMode;
-            let newTheme;
-
-           if (themeMode === 'system') {
-      newThemeMode = theme.mode === 'light' ? 'dark' : 'light';
-    } else {
-      newThemeMode = themeMode === 'light' ? 'dark' : 'system';
-    }
-              ////
-             setThemeMode(newThemeMode);
-
-            if (newThemeMode === 'light') {
-                 newTheme = lightTheme;
-             } else if (newThemeMode === 'dark'){
-                newTheme = darkTheme;
-            } else {
-                 newTheme = deviceTheme === 'dark' ? darkTheme : lightTheme;
-           }
-
-           animatedThemeChange(newTheme);
-
-           try{
-             await AsyncStorage.setItem('themeMode', newThemeMode);
-              } catch (error) {
-                    console.log('Error saving theme preference:',error);
-            }
-        };
-       
-             return (
-                 <ThemeContext.Provider value={{ theme, toggleTheme, themeMode }}>
-                    {children}
-                  </ThemeContext.Provider>
-                 );
-
-
+    return (
+        <ThemeContext.Provider 
+            value={{ 
+                theme,                // Current theme object with static values
+                prevTheme: prevThemeRef.current, // Previous theme for animation reference
+                isAnimating,          // Flag to indicate theme is changing
+                toggleTheme,          // Function to toggle theme
+                themeMode             // Current theme mode (light/dark/system)
+            }}
+        >
+            {children}
+        </ThemeContext.Provider>
+    );
 };
